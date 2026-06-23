@@ -1,26 +1,84 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+
+* {
+  box-sizing: border-box;
 }
 
 @theme inline {
+  /* Háttér és szöveg */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  /* Brand színek */
+  --color-primary:        #22c55e;   /* zöld accent */
+  --color-primary-hover:  #16a34a;
+  --color-primary-muted:  #dcfce7;   /* halvány zöld bg (selected card) */
+
+  /* Felületek */
+  --color-surface:        var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-sidebar:        var(--sidebar);
+
+  /* Szöveg hierarchia */
+  --color-text-primary:   var(--foreground);
+  --color-text-muted:     var(--text-muted);
+  --color-text-subtle:    var(--text-subtle);
+
+  /* Border */
+  --color-border:         var(--border);
+
+  /* Makró színek (nutrition) */
+  --color-macro-protein:  #3b82f6;   /* kék */
+  --color-macro-carbs:    #f59e0b;   /* sárga */
+  --color-macro-fat:      #ef4444;   /* piros */
+
+  /* Betűtípusok */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Border radius */
+  --radius-card: 12px;
+  --radius-btn:  8px;
 }
 
+/* Light mód */
+:root {
+  --background:    #f8fafc;
+  --foreground:    #0f172a;
+  --surface:       #ffffff;
+  --surface-raised:#f1f5f9;
+  --sidebar:       #1a1a2e;
+  --text-muted:    #64748b;
+  --text-subtle:   #94a3b8;
+  --border:        #e2e8f0;
+}
+
+/* Dark mód */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background:    #0f0f1a;
+    --foreground:    #f1f5f9;
+    --surface:       #1a1a2e;
+    --surface-raised:#242438;
+    --sidebar:       #12121f;
+    --text-muted:    #94a3b8;
+    --text-subtle:   #64748b;
+    --border:        #2d2d4a;
   }
 }
+
+
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
+
+.form-radio {
+  @apply hidden;
+}
+
+
