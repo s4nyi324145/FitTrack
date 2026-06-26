@@ -1,13 +1,29 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 
-const NotesField = () => {
+type Props = {
+  initialNotes?: string;
+};
+
+const NotesField = ({ initialNotes = "" }: Props) => {
+  const [notes, setNotes] = useState(initialNotes);
+
+  const handleSaveNote = async () => {
+
+    
+  }
+
   return (
-    <textarea
-      placeholder="Add workout notes..."
-      className=" p-2   w-full rounded-btn border border-border bg-surface-raised px-3 text-md text-foreground outline-none transition-colors placeholder:text-text-subtle focus:border-primary focus:bg-surface focus:ring-2 focus:ring-primary/20"
-    ></textarea>
+    <div className="flex flex-col gap-1.5">
+      <textarea
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+        placeholder="Add workout notes..."
+        rows={2}
+        className="p-3 w-full rounded-md border border-border bg-surface-raised text-sm text-foreground outline-none transition-colors placeholder:text-text-subtle focus:border-primary focus:bg-surface focus:ring-2 focus:ring-primary/20 resize-none"
+      />
+    </div>
   );
 };
 

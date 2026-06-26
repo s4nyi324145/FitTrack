@@ -152,48 +152,92 @@ export const deleteExerciseFromWorkout = async (
   }
 };
 
-
-
 export const saveSetToExercise = async ({
-  id, number, weight, reps, completed, exercise_id
+  id,
+  number,
+  weight,
+  reps,
+  completed,
+  exercise_id,
 }: {
-  id?: number  
-  number: number
-  weight: number
-  reps: number | null
-  completed: boolean
-  exercise_id: number
+  id?: number;
+  number: number;
+  weight: number;
+  reps: number | null;
+  completed: boolean;
+  exercise_id: number;
 }) => {
+
+  const session = await auth()
+  const userId = session?.user?.id
+  
   try {
+    const ownerCheck = await pool.query(
+      `SELECT 1 FROM workout_exercises we
+   JOIN workouts w ON w.id = we.workout_id
+   WHERE we.id = $1 AND w.user_id = $2`,
+      [exercise_id, userId],
+    );
+    if (ownerCheck.rowCount === 0) return { error: "Unauthorized" };
+
     if (id) {
       await pool.query(
         `UPDATE sets SET weight_kg=$1, reps=$2, is_completed=$3, completed_at=NOW() 
          WHERE id=$4`,
-        [weight, reps, completed, id]
-      )
-      return { success: true, id }
+        [weight, reps, completed, id],
+      );
+      return { success: true, id };
     } else {
       const result = await pool.query(
         `INSERT INTO sets (workout_exercise_id, set_number, weight_kg, reps, is_completed, completed_at) 
          VALUES ($1,$2,$3,$4,$5, NOW()) RETURNING id`,
-        [exercise_id, number, weight, reps, completed]
-      )
-      return { success: true, id: result.rows[0].id }
+        [exercise_id, number, weight, reps, completed],
+      );
+      return { success: true, id: result.rows[0].id };
     }
   } catch (error) {
-    console.error("Save set error:", error)
-    return { error: "Server error" }
+    console.error("Save set error:", error);
+    return { error: "Server error" };
   }
-}
+};
 
+export const deleteSet = async (set_id: number) => {
+  if (!set_id || isNaN(set_id)) return { error: "Invalid set id" };
+
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  if (!userId) return { error: "Unauthorized" };
+
+  try {
+    const result = await pool.query(
+      `DELETE FROM sets 
+       WHERE id = $1 
+         AND workout_exercise_id IN (
+           SELECT we.id FROM workout_exercises we
+           JOIN workouts w ON w.id = we.workout_id
+           WHERE w.user_id = $2
+         )`,
+      [set_id, userId],
+    );
+
+    if (result.rowCount === 0)
+      return { error: "Set not found or unauthorized" };
+
+    return { success: true };
+  } catch (error) {
+    console.error("Delete set error:", error);
+    return { error: "Server error" };
+  }
+};
 
 export const saveExerciseNote = async (id: number, note: string) => {
-  if (!id || isNaN(id)|| id < 0) return { error: "Invalid exercise Id" }
+  if (!id || isNaN(id) || id < 0) return { error: "Invalid exercise Id" };
 
-  const session = await auth()
-  const userId = session?.user?.id
+  const session = await auth();
+  const userId = session?.user?.id;
 
-  if (!userId) return { error: "Unauthorized" }
+  if (!userId) return { error: "Unauthorized" };
 
   try {
     const result = await pool.query(
@@ -202,16 +246,43 @@ export const saveExerciseNote = async (id: number, note: string) => {
        WHERE id = $2 
          AND workout_id IN (SELECT id FROM workouts WHERE user_id = $3)
        RETURNING workout_id`,
-      [note, id, userId]
-    )
+      [note, id, userId],
+    );
 
-    if (result.rowCount === 0) return { error: "Not found or unauthorized" }
+    if (result.rowCount === 0) return { error: "Not found or unauthorized" };
 
-    revalidatePath(`/workouts/${result.rows[0].workout_id}/active`)
-    return { success: true }
-
+    revalidatePath(`/workouts/${result.rows[0].workout_id}/active`);
+    return { success: true };
   } catch (error) {
-    console.error("Add note to exercise error:", error)
-    return { error: "Server error" }
+    console.error("Add note to exercise error:", error);
+    return { error: "Server error" };
   }
-}
+};
+
+export const updateWorkoutName = async (id: number, name: string) => {
+  if (!id || isNaN(id) || id < 0) return { error: "Invalid exercise Id" };
+
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  if (!userId) return { error: "Unauthorized" };
+
+  try {
+    const result = await pool.query(
+      `UPDATE workouts 
+       SET name = $1 
+       WHERE id = $2 
+         AND user_id = $3
+       RETURNING id`,
+      [name, id, userId],
+    );
+
+    if (result.rowCount === 0) return { error: "Not found or unauthorized" };
+
+    revalidatePath(`/workouts/${result.rows[0].id}/active`);
+    return { success: true };
+  } catch (error) {
+    console.error("Add note to exercise error:", error);
+    return { error: "Server error" };
+  }
+};

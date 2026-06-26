@@ -9,49 +9,29 @@ import {
   Trash2,
   Plus,
   X,
-  Minus
+  Minus,
 } from "lucide-react";
 import {
   deleteExerciseFromWorkout,
   saveExerciseNote,
   saveSetToExercise,
+  deleteSet,
 } from "@/app/actions/workoutsActions";
-import { start } from "repl";
 
-const muscleGroupColors: Record<
-  string,
+const muscleGroupColors: Record< 
+string,
   { bg: string; text: string; border: string }
 > = {
   chest: { bg: "bg-blue-500", text: "text-white", border: "border-blue-600" },
-  back: {
-    bg: "bg-purple-500",
-    text: "text-white",
-    border: "border-purple-600",
-  },
-  shoulders: {
-    bg: "bg-yellow-500",
-    text: "text-white",
-    border: "border-yellow-600",
-  },
-  biceps: {
-    bg: "bg-green-500",
-    text: "text-white",
-    border: "border-green-600",
-  },
-  triceps: {
-    bg: "bg-orange-500",
-    text: "text-white",
-    border: "border-orange-600",
-  },
+  back: { bg: "bg-purple-500", text: "text-white", border: "border-purple-600" },
+  shoulders: { bg: "bg-yellow-500", text: "text-white", border: "border-yellow-600" },
+  biceps: { bg: "bg-green-500", text: "text-white", border: "border-green-600" },
+  triceps: { bg: "bg-orange-500", text: "text-white", border: "border-orange-600" },
   legs: { bg: "bg-red-500", text: "text-white", border: "border-red-600" },
   glutes: { bg: "bg-pink-500", text: "text-white", border: "border-pink-600" },
   core: { bg: "bg-cyan-500", text: "text-white", border: "border-cyan-600" },
   cardio: { bg: "bg-rose-500", text: "text-white", border: "border-rose-600" },
-  full_body: {
-    bg: "bg-teal-500",
-    text: "text-white",
-    border: "border-teal-600",
-  },
+  full_body: { bg: "bg-teal-500", text: "text-white", border: "border-teal-600" },
 };
 
 type Sets = {
@@ -106,6 +86,20 @@ const ActiveExerciseCard = ({
     ]);
   };
 
+  const handleRemoveLastSet = async () => {
+    if (sets.length === 0) return;
+    const lastSet = sets[sets.length - 1];
+
+    setSets((prev) => prev.slice(0, -1));
+
+    if (lastSet.id) {
+      const result = await deleteSet(lastSet.id);
+      if (result?.error) {
+        setError(result.error);
+      }
+    }
+  };
+
   const handleDeleteExercise = async (
     e: React.MouseEvent<HTMLButtonElement>,
   ) => {
@@ -124,29 +118,29 @@ const ActiveExerciseCard = ({
     const newCompleted = !set.completed;
     updateSet(index, { completed: newCompleted });
 
-    const completedSets = sets.filter((set) => set.completed == true);
-
     const result = await saveSetToExercise({
       id: set.id || undefined,
-      number: completedSets.length + 1,
+      number: set.number,
       weight: parseInt(set.weight),
       reps: set.reps,
       completed: newCompleted,
       exercise_id: ex.id,
     });
 
+    if (result?.error) {
+      setError(result.error);
+      updateSet(index, { completed: !newCompleted }); 
+      return;
+    }
+
     if (result?.id) {
       updateSet(index, { id: result.id });
     }
   };
 
-  const handleRemoveSet = () => {
-    setSets((prev) => prev.filter((_, i) => i !== sets.length - 1));
-    // TODO: ha már mentve volt DB-be, itt egy delete action is kellhet
-  };
-
   const handleSaveNote = () => {
     setError(null);
+    if (noteInput === ex.notes) return;
     startTransition(async () => {
       const result = await saveExerciseNote(ex.id, noteInput);
       if (result?.error) {
@@ -238,7 +232,7 @@ const ActiveExerciseCard = ({
               </button>
               <button
                 onClick={handleSaveNote}
-                disabled={isPending}
+                disabled={isPending || ex.notes === noteInput}
                 className="border-border cursor-pointer hover:bg-primary-hover transition-colors bg-primary text-white border rounded-md flex py-1.5 justify-center flex-1 disabled:opacity-50 font-semibold"
               >
                 {isPending ? "Saving..." : "Save"}
@@ -260,11 +254,15 @@ const ActiveExerciseCard = ({
               <span
                 className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${muscle.bg} ${muscle.text} ${muscle.border}`}
               >
-                {ex.muscle_group.charAt(0).toUpperCase() +
-                  ex.muscle_group.slice(1)}
+                {ex.muscle_group.charAt(0).toUpperCase() + ex.muscle_group.slice(1)}
               </span>
             </div>
             <div className="flex items-center gap-3">
+              {ex.is_custom && (
+                <span className="flex text-xs font-semibold px-2 py-0.5 rounded-full bg-primary-hover/50 text-primary border border-primary/30">
+                  Custom
+                </span>
+              )}
               {isOpen ? (
                 <ChevronUp size={18} className="text-text-muted" />
               ) : (
@@ -288,7 +286,7 @@ const ActiveExerciseCard = ({
                 e.stopPropagation();
                 setShowAddNote(true);
               }}
-              className="text-text-muted text-sm cursor-pointer hover:text-foreground"
+              className="text-text-muted text-sm cursor-pointer w-fit hover:text-foreground"
             >
               {ex.notes}
             </p>
@@ -317,7 +315,6 @@ const ActiveExerciseCard = ({
               </button>
             ) : (
               <>
-                {/* Tábla fejléc */}
                 <div className="grid grid-cols-[40px_80px_1fr_1fr_40px] items-center gap-2 font-bold text-xs uppercase text-text-muted bg-surface border-y border-border px-4 py-2">
                   <p>Set</p>
                   <p>Previous</p>
@@ -326,7 +323,6 @@ const ActiveExerciseCard = ({
                   <p className="text-center">✓</p>
                 </div>
 
-                {/* Sorok */}
                 <div className="flex flex-col">
                   {sets.map((set, index) => (
                     <div
@@ -335,21 +331,18 @@ const ActiveExerciseCard = ({
                         set.completed ? "bg-primary/5" : "bg-surface"
                       }`}
                     >
-                      <p className="text-sm font-semibold  text-text-muted">
+                      <p className="text-sm font-semibold text-text-muted">
                         {set.type === "warmup" ? "W" : set.number}
                       </p>
 
-                      <p className="text-xs text-text-muted">
-                        {set.previous ?? "—"}
-                      </p>
+                      <p className="text-xs text-text-muted">{set.previous ?? "—"}</p>
 
                       <input
                         type="number"
                         value={set.weight}
-                        onChange={(e) => {
-                          updateSet(index, { weight: e.target.value });
-                          updateSet(index, { completed: false });
-                        }}
+                        onChange={(e) =>
+                          updateSet(index, { weight: e.target.value, completed: false })
+                        }
                         placeholder="0"
                         className="w-full text-center text-sm font-semibold border border-border rounded-md py-1.5 bg-surface-raised focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-colors"
                       />
@@ -357,14 +350,12 @@ const ActiveExerciseCard = ({
                       <input
                         type="number"
                         value={set.reps ?? ""}
-                        onChange={(e) => {
+                        onChange={(e) =>
                           updateSet(index, {
-                            reps: e.target.value
-                              ? Number(e.target.value)
-                              : null,
-                          });
-                          updateSet(index, { completed: false });
-                        }}
+                            reps: e.target.value ? Number(e.target.value) : null,
+                            completed: false,
+                          })
+                        }
                         placeholder="0"
                         className="w-full text-center text-sm font-semibold border border-border rounded-md py-1.5 bg-surface-raised focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-colors"
                       />
@@ -385,22 +376,21 @@ const ActiveExerciseCard = ({
                   ))}
                 </div>
 
-                {/* Add Set */}
                 <div className="flex">
                   <button
-                  onClick={handleRemoveSet}
-                  className="flex items-center cursor-pointer justify-center gap-1.5 flex-[0.5] text-red-500 text-sm font-semibold py-3 hover:bg-red-500/5 transition-colors border-t border-dashed border-border"
-                >
-                  <Minus size={14} />
-                  Remove Set
-                </button>
+                    onClick={handleRemoveLastSet}
+                    className="flex items-center cursor-pointer justify-center gap-1.5 flex-[0.5] text-red-500 text-sm font-semibold py-3 hover:bg-red-500/5 transition-colors border-t border-dashed border-border"
+                  >
+                    <Minus size={14} />
+                    Remove Set
+                  </button>
                   <button
-                  onClick={handleNewSet}
-                  className="flex items-center cursor-pointer justify-center flex-[0.5] gap-1.5 text-primary text-sm font-semibold py-3 hover:bg-primary/5 transition-colors border-t border-dashed border-border"
-                >
-                  <Plus size={14} />
-                  Add Set
-                </button>
+                    onClick={handleNewSet}
+                    className="flex items-center cursor-pointer justify-center flex-[0.5] gap-1.5 text-primary text-sm font-semibold py-3 hover:bg-primary/5 transition-colors border-t border-dashed border-border"
+                  >
+                    <Plus size={14} />
+                    Add Set
+                  </button>
                 </div>
               </>
             )}

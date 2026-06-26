@@ -14,7 +14,7 @@ const AddExerciseField = ({workoutId, exercises, workoutDetail}: {workoutId:numb
       {showExercises && <AddExerciseModal workoutDetail={workoutDetail} setShowExercises={setShowExercises} workoutId={workoutId} exercises={exercises}/>}
 
 
-      <div onClick={() => setShowExercises(true)} className='flex  flex-1 group transition-all cursor-pointer text-primary-hover gap-4 items-center mt-7 rounded-md justify-center border-3 p-4 border-primary-hover border-dashed'>
+      <div onClick={() => setShowExercises(true)} className='flex  flex-1 group transition-all cursor-pointer text-primary-hover gap-4 items-center  rounded-md justify-center border-3 p-4 border-primary-hover border-dashed'>
         <CirclePlus className='group' size={30} />
           <p className='text-lg group font-bold'>Add Exercise</p>
       </div>

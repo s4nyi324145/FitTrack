@@ -93,7 +93,7 @@ const ExerciseCard = ({ exercise, onSelect }: { exercise: Exercise; onSelect?: (
           {muscleGroupLabel[exercise.muscle_group] ?? exercise.muscle_group}
         </span>
         {exercise.is_custom && (
-          <span className="absolute top-2 right-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/30">
+          <span className="absolute top-2 right-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-primary-hover/50 text-primary border border-primary/30">
             Custom
           </span>
         )}

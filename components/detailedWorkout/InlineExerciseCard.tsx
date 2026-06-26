@@ -117,7 +117,15 @@ const InlineExerciseCard = ({
             {equipmentConfig[ex.equipment].label}
           </p>
         </div>
+        
       </div>
+
+      <div className="flex gap-4 items-center">
+        {ex.is_custom && (
+          <span className="flex  text-xs font-semibold px-2 py-0.5 rounded-full bg-primary-hover/50 text-primary border border-primary/30">
+            Custom
+          </span>
+        )}
 
       <div className="bg-primary-hover p-2 text-black rounded-full">
         {isAdded ? (
@@ -125,6 +133,7 @@ const InlineExerciseCard = ({
         ) : (
           <Plus size={20} strokeWidth={3} />
         )}
+      </div>
       </div>
     </div>
   );
