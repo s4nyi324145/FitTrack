@@ -3,22 +3,19 @@ import { ArrowLeft, Dumbbell } from "lucide-react";
 import { getWorkoutDetail } from "@/lib/queries/workouts";
 import Link from "next/link";
 
-import NotesField from "@/components/detailedWorkout/NotesField";
-import AddExerciseField from "@/components/detailedWorkout/AddExerciseField";
+import NotesField from "@/components/workoutDetails/NotesField";
+import AddExerciseField from "@/components/workoutDetails/AddExerciseField";
 import { getAllExercise } from "@/lib/queries/exercises";
-import ActiveExerciseCard from "@/components/detailedWorkout/ActiveExerciseCard";
-import ActiveWorkoutHeader from "@/components/detailedWorkout/ActiveWorkoutHeader";
+import ActiveExerciseCard from "@/components/workoutDetails/ActiveExerciseCard";
+import ActiveWorkoutHeader from "@/components/workoutDetails/ActiveWorkoutHeader";
+import ActiveExercisesList from "@/components/workoutDetails/ActiveExercisesList";
 
-const ActiveWorkoutPage = async ({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) => {
+const ActiveWorkoutPage = async ({params}: {params: Promise<{ id: string }>;}) => {
   const { id } = await params;
   const workoutDetail = await getWorkoutDetail(parseInt(id));
   const exercises = await getAllExercise();
 
-  if (!workoutDetail || Array.isArray(workoutDetail)) {
+  if (!workoutDetail || Array.isArray(workoutDetail) || workoutDetail.finished_at !== null) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center h-full gap-4 p-8">
         <Dumbbell size={40} className="text-text-muted" />
@@ -35,13 +32,13 @@ const ActiveWorkoutPage = async ({
 
   return (
     <div className="flex flex-1 flex-col">
-      {/* Sticky header */}
+   
       <ActiveWorkoutHeader workoutDetail={workoutDetail} />
       <hr className="border border-border" />
 
       <div className="flex  flex-col flex-1 justify-between gap-4 p-8">
         <div className="flex gap-4 flex-col">
-          <NotesField initialNotes={workoutDetail.notes} />
+          <NotesField initialNotes={workoutDetail.notes ?? ""} workoutId={workoutDetail.id} />
 
           {workoutDetail.exercises.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-3 py-16 bg-surface border border-dashed border-border rounded-xl">
@@ -54,15 +51,7 @@ const ActiveWorkoutPage = async ({
               </p>
             </div>
           ) : (
-            <div className="flex flex-col gap-3">
-              {workoutDetail.exercises.map((ex, index) => (
-                <ActiveExerciseCard
-                  key={index}
-                  workout_id={parseInt(id)}
-                  ex={ex}
-                />
-              ))}
-            </div>
+            <ActiveExercisesList workoutDetail={workoutDetail}/>
           )}
         </div>
 

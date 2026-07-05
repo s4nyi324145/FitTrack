@@ -93,7 +93,7 @@ const InlineExerciseCard = ({
 
   const handleAddingExercise = async () => {
     if(isAdded) return false
-    const order = workoutDetail.exercises.length + 1
+    const order = workoutDetail.exercises.length 
     await addExerciseToWorkout(workout_id, ex.id, order);
   };
 

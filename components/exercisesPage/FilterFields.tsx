@@ -1,6 +1,12 @@
 import React from 'react'
 import type { FilterExercise } from '@/types'
-const FilterFields = ({filter, setFilter}: {filter: FilterExercise, setFilter: React.Dispatch<React.SetStateAction<FilterExercise>>}) => {
+
+type Props = {
+  filter: FilterExercise,
+  setFilter: React.Dispatch<React.SetStateAction<FilterExercise>>
+}
+
+const FilterFields = ({filter, setFilter}: Props) => {
 
   const muscleGrops = ["All", "Chest", "Back","Shoulders","Biceps","Triceps" ,"Legs", "Glutes", "Core", "Cardio"]
 

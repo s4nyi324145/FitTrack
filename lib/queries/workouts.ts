@@ -1,6 +1,7 @@
 import { error } from "console";
 import { auth } from "../auth";
 import pool from "../pg";
+import { WorkoutDetail } from "@/types";
 
 export const getLastWorkout = async (userId: number) => {
   try {
@@ -22,11 +23,15 @@ export const getWorkoutsData = async () => {
   const session = await auth();
   const userId = session?.user?.id;
 
+  if (!userId) {
+    return [];
+  }
+
   try {
     const result = await pool.query(
       `SELECT 
-    COALESCE(SUM(total_volume_kg), 0) AS "total_volume", 
-    COUNT(id) AS "total_workouts", 
+    COALESCE(SUM(total_volume_kg), 0)::int AS "total_volume", 
+    COUNT(id)::int AS "total_workouts", 
     COALESCE(AVG(duration_seconds), 0) AS "avg_duration", 
     (
         SELECT COUNT(id) 
@@ -52,26 +57,29 @@ export const getRecentWorkouts = async () => {
   try {
     const result = await pool.query(
       `
-  SELECT 
-    w.*,
-    COUNT(we.id)::int AS total_exercises,
-    (
-      SELECT e.muscle_group 
-      FROM workout_exercises we2
-      JOIN exercises e ON e.id = we2.exercise_id
-      WHERE we2.workout_id = w.id
-      ORDER BY we2.sort_order ASC
-      LIMIT 1
-    ) AS primary_muscle
-  FROM workouts w
-  LEFT JOIN workout_exercises we ON w.id = we.workout_id
-  WHERE w.user_id = $1
-    AND w.started_at >= NOW() - INTERVAL '30 days'
-  GROUP BY w.id
-  ORDER BY w.started_at DESC
-`,
+      SELECT 
+        w.*,
+        COUNT(we.id)::int AS total_exercises,
+        (
+          SELECT e.muscle_group 
+          FROM workout_exercises we2
+          JOIN exercises e ON e.id = we2.exercise_id
+          WHERE we2.workout_id = w.id
+          ORDER BY we2.sort_order ASC
+          LIMIT 1
+        ) AS primary_muscle
+      FROM workouts w
+      LEFT JOIN workout_exercises we ON w.id = we.workout_id
+      WHERE w.user_id = $1
+        AND w.started_at >= NOW() - INTERVAL '30 days'
+      GROUP BY w.id
+      ORDER BY w.started_at DESC
+    `,
       [userId],
     );
+
+    
+    
 
     return result.rows;
   } catch (error) {
@@ -85,6 +93,10 @@ export const getWorkoutDetail = async (workourId: number) => {
 
   const session = await auth()
   const userId = session?.user?.id
+
+  if (!userId) {
+    return [];
+  }
 
   try {
     const result = await pool.query(
@@ -111,12 +123,12 @@ export const getWorkoutDetail = async (workourId: number) => {
     s.reps,
     s.rpe,
     s.is_completed
-FROM workouts w
-LEFT JOIN workout_exercises we ON w.id = we.workout_id
-LEFT JOIN exercises e ON we.exercise_id = e.id
-LEFT JOIN sets s ON we.id = s.workout_exercise_id
-WHERE w.id = $1  AND w.user_id = $2
-ORDER BY we.sort_order ASC, s.set_number ASC;`,
+    FROM workouts w
+    LEFT JOIN workout_exercises we ON w.id = we.workout_id
+    LEFT JOIN exercises e ON we.exercise_id = e.id
+    LEFT JOIN sets s ON we.id = s.workout_exercise_id
+    WHERE w.id = $1  AND w.user_id = $2
+    ORDER BY we.sort_order ASC, s.set_number ASC;`,
       [workourId, userId],
     );
 
@@ -124,9 +136,9 @@ ORDER BY we.sort_order ASC, s.set_number ASC;`,
 
     if (rows.length === 0) return []
 
-    console.log(rows);
+  
 
-    const workoutDetail = {
+    const workoutDetail: WorkoutDetail = {
       id: rows[0].workout_id,
       name: rows[0].workout_name,
       notes: rows[0].workout_notes,
@@ -164,7 +176,7 @@ ORDER BY we.sort_order ASC, s.set_number ASC;`,
           id: row.set_id,
           number: row.set_number,
           type: row.set_type,
-          weight: row.weight_kg,
+          weight: parseInt(row.weight_kg),
           reps: row.reps,
           rpe: row.rpe,
           completed: row.is_completed,
@@ -174,8 +186,6 @@ ORDER BY we.sort_order ASC, s.set_number ASC;`,
 
     return workoutDetail;
   } catch (error) {
-    console.log(error);
-
     return [];
   }
 };

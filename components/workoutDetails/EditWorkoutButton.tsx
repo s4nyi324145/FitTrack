@@ -3,6 +3,7 @@
 import React, { useState, useTransition } from 'react'
 import { Pencil, X } from 'lucide-react'
 import { editWorkoutById } from '@/app/actions/workoutsActions'
+import { useToast } from '@/app/context/toastContext'
 
 type Props = {
   id: number
@@ -11,19 +12,23 @@ type Props = {
 }
 
 const EditWorkoutButton = ({ id, currentName, currentNotes }: Props) => {
+
   const [showModal, setShowModal]   = useState(false)
   const [isPending, startTransition] = useTransition()
   const [error, setError]           = useState<string | null>(null)
   const [name, setName]             = useState(currentName)
   const [notes, setNotes]           = useState(currentNotes ?? "")
 
+  const {showSuccess} = useToast()
+
   const handleEdit = () => {
     setError(null)
     startTransition(async () => {
       const result = await editWorkoutById(id, name, notes)
       if (result?.error) {
-        setError(result.error)
+       setError(result.error)
       } else {
+        showSuccess("Workout updated successfully")
         setShowModal(false)
       }
     })
@@ -42,18 +47,17 @@ const EditWorkoutButton = ({ id, currentName, currentNotes }: Props) => {
         <div className="fixed inset-0 bg-background/70 backdrop-blur-xs flex items-center justify-center z-50">
           <div className="bg-surface w-full max-w-[440px] flex rounded-xl border border-border flex-col">
             
-            {/* Header */}
+          
             <div className="flex items-center justify-between p-5 border-b border-border">
               <p className="font-bold text-lg">Edit Workout</p>
               <button
                 onClick={handleClose}
-                className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-surface-raised transition-colors text-text-muted"
+                className="w-7 h-7 flex items-center justify-center rounded-full hover:text-red-400 cursor-pointer transition-colors text-text-muted"
               >
                 <X size={16} />
               </button>
             </div>
 
-            {/* Body */}
             <div className="flex flex-col gap-4 p-5">
               {error && (
                 <p className="text-red-500 font-semibold text-sm bg-red-500/10 p-3 rounded-md">
@@ -88,7 +92,7 @@ const EditWorkoutButton = ({ id, currentName, currentNotes }: Props) => {
               </div>
             </div>
 
-            {/* Footer */}
+       
             <div className="flex gap-3 p-5 border-t border-border">
               <button
                 onClick={handleClose}

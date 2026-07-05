@@ -73,7 +73,7 @@ export type WorkoutDetail = {
       id: number;
       number: number;
       type: string;
-      weight: string; 
+      weight: number; 
       reps: number | null;
       rpe: string | null;  
       completed: boolean;
@@ -81,3 +81,45 @@ export type WorkoutDetail = {
   }[]; 
 };
 export type WorkoutStats = {total_workouts: number, this_week_workouts: number, total_volume: number, avg_duration: number}
+
+export type PersonalRecord = {
+ record_type: string,
+ value: number
+}
+
+export type ExerciseCard = {
+ id: number;
+ exercise_id: number;
+ name: string;
+ order: number;
+ is_custom: number;
+ notes?: string;
+ muscle_group: string;
+ sets: {
+ id: number;
+ number: number;
+ type: string;
+ weight: string;
+ reps: number | null;
+ rpe: string | null;
+ completed: boolean;
+ }[];
+}
+
+export type TemplateWorkout = {
+  template_id: number;
+  template_name: string;
+  template_notes: string;
+  exercises: {
+    template_exercise_id: number;
+    sort_order: number;
+    default_sets: number;
+    default_reps: number;
+    default_weight_kg: number;
+    exercise_id: number;
+    exercise_name: string;
+    muscle_group: string;
+  }[];
+}
+
+

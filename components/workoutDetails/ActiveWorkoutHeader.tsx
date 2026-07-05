@@ -1,21 +1,31 @@
 "use client"
 
 import React, { useState } from 'react'
-import WorkoutTimer from "@/components/detailedWorkout/WorkoutTimer";
-import FinisWorkoutBtn from "@/components/detailedWorkout/FinisWorkoutBtn";
+import WorkoutTimer from "@/components/workoutDetails/WorkoutTimer";
+import FinisWorkoutBtn from "@/components/workoutDetails/FinisWorkoutBtn";
 import { ArrowLeft, Check } from 'lucide-react';
 import Link from 'next/link';
 import { WorkoutDetail } from '@/types';
-import { updateWorkoutName } from '@/app/actions/workoutsActions';
+import { finishWorkout, updateWorkoutName } from '@/app/actions/workoutsActions';
+import {useToast} from '@/app/context/toastContext';
+import { useRouter } from 'next/navigation';
+
 const ActiveWorkoutHeader = ({ workoutDetail }: { workoutDetail: WorkoutDetail }) => {
   const [editName, setEditName] = useState(false)
   const [newName, setNewName] = useState<string>(workoutDetail.name)
   const [isPending, setIsPending] = useState(false)
 
+  const {showError, showSuccess} = useToast()
+
+  const router = useRouter()
+
   const handleSaveWorkoutName = async () => {
+
+
     if (!newName.trim()) {
       setNewName(workoutDetail.name)
       setEditName(false)
+      showError("Workout name cannot be empty")
       return
     }
 
@@ -24,13 +34,56 @@ const ActiveWorkoutHeader = ({ workoutDetail }: { workoutDetail: WorkoutDetail }
       const result = await updateWorkoutName(workoutDetail.id, newName.trim())
       if (result?.error) {
         setNewName(workoutDetail.name)
+        showError(result.error)
+        return
       }
+
+      showSuccess("Workout name updated successfully")
+
     } catch (error) {
-      console.log(error)
       setNewName(workoutDetail.name)
+      showError("Failed to update workout name")
     } finally {
       setIsPending(false)
       setEditName(false)
+    }
+  }
+
+  const handleFinishWorkout = async () => {
+
+
+    setIsPending(true)
+    
+
+    try {
+
+      const allSets = workoutDetail.exercises.flatMap(ex => ex.sets) // Flatten all sets from all exercises
+      const completedSets = allSets.filter(s => s.completed)
+
+      const totalVolume = completedSets.reduce((acc, s) => acc + (Number(s.weight) * (s.reps ?? 0)), 0)
+      const totalSets = completedSets.length
+
+      const result = await finishWorkout(workoutDetail.id,workoutDetail.started_at, totalVolume, totalSets)
+
+      if (result?.error) {
+        showError(result.error)
+        return
+      }
+
+      if (result?.success) {
+        showSuccess("Workout finished successfully")
+        router.push("/workouts")
+        router.refresh()
+      }
+      
+      
+    } catch (error) {
+      console.log(error)
+      showError("Failed to finish workout")
+      
+    }
+    finally {
+      setIsPending(false)
     }
   }
 
@@ -78,7 +131,11 @@ const ActiveWorkoutHeader = ({ workoutDetail }: { workoutDetail: WorkoutDetail }
 
       <div className="flex gap-4 shrink-0">
         <WorkoutTimer started_at={workoutDetail.started_at} />
-        <FinisWorkoutBtn />
+        <button disabled={isPending} onClick={() => handleFinishWorkout()} className='flex bg-primary cursor-pointer hover:bg-primary-hover rounded-md items-center px-4 font-bold text-white'>
+        <p>
+          {isPending ? "Finishing..." : "Finish Workout"}  
+        </p>
+         </button>
       </div>
     </div>
   )

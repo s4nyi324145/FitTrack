@@ -3,21 +3,27 @@
 import React, { useState, useTransition } from 'react'
 import { Trash2, TriangleAlert } from 'lucide-react'
 import { deleteWorkoutById } from '@/app/actions/workoutsActions'
+import { useToast } from '@/app/context/toastContext'
 
 const DeleteWorkoutButton = ({ id, name }: { id: string; name: string }) => {
   const [showConfirm, setShowConfirm] = useState(false)
   const [isPending, startTransition] = useTransition() 
   const [error, setError] = useState<null | string>(null)
 
+  const {showError, showSuccess} = useToast()
+
   const handleWorkoutDelete = () => {
     setError(null)
     startTransition(async () => {
       const result = await deleteWorkoutById(parseInt(id,10))
-      
      
       if (result?.error) {
-        setError(result.error)
+       return showError(result.error)
       }
+
+      showSuccess("Workout deleted successfully")
+
+
     })
     
   }

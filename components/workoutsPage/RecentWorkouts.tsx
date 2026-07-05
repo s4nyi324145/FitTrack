@@ -1,7 +1,7 @@
 import type { RecentWorkout } from '@/types'
 import { Dumbbell, Weight, LayoutList, Clock, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
-import React from 'react'
+import { formatDuration, getRelativeDate } from '@/lib/utils/dataFormation'
 
 const muscleGroupColors: Record<string, { bg: string; text: string }> = {
   chest:     { bg: "bg-blue-500/30",   text: "text-blue-500"   },
@@ -15,20 +15,7 @@ const muscleGroupColors: Record<string, { bg: string; text: string }> = {
   cardio:    { bg: "bg-rose-500/30",   text: "text-rose-500"   },
 }
 
-const getRelativeDate = (date: Date) => {
-  const diff = Math.floor((new Date().getTime() - new Date(date).getTime()) / (1000 * 60 * 60 * 24))
-  if (diff === 0) return "Today"
-  if (diff === 1) return "Yesterday"
-  return new Date(date).toLocaleDateString("en-EN", { month: "short", day: "numeric", year: "numeric" })
-}
 
-const formatDuration = (seconds: number | null) => {
-  if (!seconds) return "—"
-  const h = Math.floor(seconds / 3600)
-  const m = Math.floor((seconds % 3600) / 60)
-  if (h > 0) return `${h}h ${m}m`
-  return `${m} min`
-}
 
 const RecentWorkouts = ({ workouts }: { workouts: RecentWorkout[] }) => {
   if (workouts.length === 0) {
@@ -66,15 +53,15 @@ const RecentWorkouts = ({ workouts }: { workouts: RecentWorkout[] }) => {
               key={index}
               className="bg-surface flex w-full flex-col border border-border rounded-xl p-4 hover:shadow-sm hover:-translate-y-0.5 transition-all gap-4"
             >
-              {/* Felső sor */}
+        
               <div className="flex items-center justify-between gap-4">
                 <div className="flex gap-3 items-center min-w-0">
-                  {/* Ikon */}
+             
                   <div className={`shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${muscle.bg}`}>
                     <Dumbbell size={18} className={muscle.text} />
                   </div>
 
-                  {/* Név + notes */}
+ 
                   <div className="flex flex-col min-w-0">
                     <p className="font-semibold text-foreground truncate">{w.name}</p>
                     {w.notes && (
@@ -91,7 +78,7 @@ const RecentWorkouts = ({ workouts }: { workouts: RecentWorkout[] }) => {
                 </div>
               </div>
 
-              {/* Alsó sor — statisztikák */}
+          
               <div className="flex items-center gap-6 pt-2 border-t border-border">
                 <div className="flex flex-col gap-0.5">
                   <p className="text-xs uppercase text-text-muted font-semibold tracking-wide">Volume</p>
@@ -103,7 +90,7 @@ const RecentWorkouts = ({ workouts }: { workouts: RecentWorkout[] }) => {
                 <div className="flex border-x-2 px-4 border-border flex-col gap-0.5">
                   <p className="text-xs uppercase text-text-muted font-semibold tracking-wide">Exercises</p>
                   <p className="text-sm font-bold text-foreground">
-                    {w.total_sets ?? "—"}
+                    {w.total_exercises ?? "—"}
                   </p>
                 </div>
 

@@ -10,6 +10,7 @@ import {
   Plus,
   X,
   Minus,
+  GripVertical,
 } from "lucide-react";
 import {
   deleteExerciseFromWorkout,
@@ -17,6 +18,9 @@ import {
   saveSetToExercise,
   deleteSet,
 } from "@/app/actions/workoutsActions";
+
+import { useDraggable } from "@dnd-kit/react";
+import { useSortable } from "@dnd-kit/react/sortable";
 
 const muscleGroupColors: Record< 
 string,
@@ -39,19 +43,18 @@ type Sets = {
   tempId?: string;
   number: number;
   type: string;
-  weight: string;
+  weight: number;
   reps: number | null;
   previous?: string;
   completed: boolean;
 };
 
-const ActiveExerciseCard = ({
-  ex,
-  workout_id,
-}: {
+type Props = {
   ex: any;
-  workout_id: number;
-}) => {
+  workout_id: number
+}
+
+const ActiveExerciseCard = ({ex,workout_id}: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [sets, setSets] = useState<Sets[]>(ex.sets);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -64,6 +67,8 @@ const ActiveExerciseCard = ({
     text: "text-text-muted",
     border: "border-border",
   };
+
+  const {ref,handleRef,isDragSource} = useSortable({id: ex.id, index: ex.order })
 
   const updateSet = (index: number, fields: Partial<Sets>) => {
     setSets((prev) =>
@@ -79,7 +84,7 @@ const ActiveExerciseCard = ({
         tempId: crypto.randomUUID(),
         number: prev.length + 1,
         type: "normal",
-        weight: "",
+        weight: 0,
         reps: null,
         completed: false,
       },
@@ -121,7 +126,7 @@ const ActiveExerciseCard = ({
     const result = await saveSetToExercise({
       id: set.id || undefined,
       number: set.number,
-      weight: parseInt(set.weight),
+      weight: set.weight,
       reps: set.reps,
       completed: newCompleted,
       exercise_id: ex.id,
@@ -154,7 +159,7 @@ const ActiveExerciseCard = ({
   return (
     <>
       {showConfirm && (
-        <div className="fixed inset-0 bg-background/70 backdrop-blur-xs flex items-center justify-center z-50">
+        <div  className="fixed inset-0 bg-background/70 backdrop-blur-xs flex items-center justify-center z-50">
           <div className="bg-surface w-full max-w-[400px] flex rounded-md border-2 border-border gap-4 items-center flex-col p-4 justify-center">
             {error && (
               <p className="text-red-500 font-bold text-sm bg-red-500/10 p-2 rounded">
@@ -242,7 +247,7 @@ const ActiveExerciseCard = ({
         </div>
       )}
 
-      <div className="flex flex-col rounded-xl border border-border overflow-hidden">
+      <div ref={ref}  style={{opacity: isDragSource ? 0.5 : 1}} className="flex flex-col rounded-xl border border-border overflow-hidden">
         {/* Header */}
         <div
           className="bg-surface-raised flex flex-col gap-1 p-4 cursor-pointer hover:bg-border/30 transition-colors"
@@ -250,6 +255,7 @@ const ActiveExerciseCard = ({
         >
           <div className="flex justify-between items-center">
             <div className="flex gap-3 items-center">
+              <GripVertical ref={handleRef} className=" cursor-pointer hover:text-primary-hover transition-colors" size={18}/>
               <p className="font-bold text-foreground">{ex.name}</p>
               <span
                 className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${muscle.bg} ${muscle.text} ${muscle.border}`}
@@ -258,11 +264,7 @@ const ActiveExerciseCard = ({
               </span>
             </div>
             <div className="flex items-center gap-3">
-              {ex.is_custom && (
-                <span className="flex text-xs font-semibold px-2 py-0.5 rounded-full bg-primary-hover/50 text-primary border border-primary/30">
-                  Custom
-                </span>
-              )}
+            
               {isOpen ? (
                 <ChevronUp size={18} className="text-text-muted" />
               ) : (
@@ -341,7 +343,7 @@ const ActiveExerciseCard = ({
                         type="number"
                         value={set.weight}
                         onChange={(e) =>
-                          updateSet(index, { weight: e.target.value, completed: false })
+                          updateSet(index, { weight: parseInt(e.target.value), completed: false })
                         }
                         placeholder="0"
                         className="w-full text-center text-sm font-semibold border border-border rounded-md py-1.5 bg-surface-raised focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-colors"

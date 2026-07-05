@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from "react"
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Weight } from "lucide-react";
+import type { ExerciseCard } from "@/types";
 
 const muscleGroupColors: Record<string,{ bg: string; text: string; border: string } > = {
   chest: { bg: "bg-blue-500", text: "text-white", border: "border-blue-600" },
@@ -37,7 +38,7 @@ const muscleGroupColors: Record<string,{ bg: string; text: string; border: strin
 };
 
 
-const ExerciseCard = ({ ex }: { ex: any }) => {
+const ExerciseCard = ({ ex }: { ex: ExerciseCard }) => {
   const [isOpen, setIsOpen] = useState(true)
   const muscle = muscleGroupColors[ex.muscle_group] ?? { bg: "bg-surface-raised", text: "text-text-muted", border: "border-border" }
 
@@ -48,12 +49,11 @@ const ExerciseCard = ({ ex }: { ex: any }) => {
     return vol > bestVol ? s : best
   }, ex.sets[0])
 
-  const totalVolume = ex.sets.reduce((acc: number, s: any) => acc + Number(s.weight) * (s.reps ?? 0), 0)
+  const totalVolume = ex.sets.reduce((acc: number, s: any) => acc + Number(s.weight) * (s.reps ?? 0), 0).toLocaleString()
 
   return (
     <div className="flex flex-col rounded-xl border border-border overflow-hidden">
-      
-      {/* Header */}
+    
       <div
         className="bg-surface-raised flex flex-col p-4 flex-1 justify-center cursor-pointer hover:bg-border/30 transition-colors"
         onClick={() => setIsOpen((prev) => !prev)}
@@ -67,11 +67,11 @@ const ExerciseCard = ({ ex }: { ex: any }) => {
         </div>
         {isOpen ? <ChevronUp size={18} className="text-text-muted" /> : <ChevronDown size={18} className="text-text-muted" />}
         </div>
-        {ex.note && <p className="text-text-muted text-sm">{ex.notes}</p>}
+        {ex.notes && <p className="text-text-muted text-sm">{ex.notes}</p>}
       </div>
       
 
-      {/* Tábla */}
+    
       {isOpen && (
         <>
           <div className="grid grid-cols-4 font-bold text-xs uppercase text-text-muted bg-surface border-y border-border px-4 py-2">
@@ -94,7 +94,7 @@ const ExerciseCard = ({ ex }: { ex: any }) => {
                   {set.type === "warmup" ? "W" : set.number}
                 </p>
                 <div className="flex items-center gap-2">
-                  <p className="font-semibold">{set.weight} kg</p>
+                  <p className="font-semibold">{parseInt(set.weight)} kg</p>
                   {isPR && (
                     <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-200">
                       🏆 PR
@@ -102,7 +102,7 @@ const ExerciseCard = ({ ex }: { ex: any }) => {
                   )}
                 </div>
                 <p className="font-semibold">{set.reps}</p>
-                <p className="text-right text-text-muted">{volume} kg</p>
+                <p className="text-right text-text-muted">{volume.toLocaleString()} kg</p>
               </div>
             )
           })}
@@ -110,7 +110,7 @@ const ExerciseCard = ({ ex }: { ex: any }) => {
           {/* Footer */}
           <div className="flex justify-between px-4 py-2 bg-surface text-xs text-text-muted">
             <p>
-              Best set: <span className="font-bold text-foreground">{bestSet?.weight}kg × {bestSet?.reps}</span>
+              Best set: <span className="font-bold text-foreground">{parseInt(bestSet?.weight)}kg × {bestSet?.reps}</span>
             </p>
             <p>
               Volume: <span className="font-bold text-foreground">{totalVolume} kg</span>

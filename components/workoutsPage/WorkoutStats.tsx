@@ -21,7 +21,7 @@ const stats = (stat: WorkoutStats) => [
   {
     icon: <Dumbbell size={20} className="text-purple-500" />,
     iconBg: "bg-purple-500/10",
-    value: `${(stat.total_volume)} kg`,
+    value: `${stat.total_volume.toLocaleString()} kg`,
     label: "Total Volume",
   },
   {
@@ -33,6 +33,7 @@ const stats = (stat: WorkoutStats) => [
 ];
 
 const WorkoutStats = async () => {
+
   const stat = await getWorkoutsData();
 
   return (

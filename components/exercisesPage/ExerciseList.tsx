@@ -2,21 +2,23 @@
 
 import React, { useEffect, useState } from "react";
 import FilterFields from "./FilterFields";
-import type { Exercise, FilterExercise, CreateExerciseInput } from "@/types";
+import type { Exercise, FilterExercise, CreateExerciseInput, PersonalRecord } from "@/types";
 import ExerciseCard from "./ExerciseCard";
 import { Dumbbell } from "lucide-react";
 import CreateExerciseModal from "./CreateExerciseModal";
 import ExerciseDetailModal from "./ExerciseDetailModal";
 import { uploadExercise } from "@/app/actions/exercisesAction";
+import { getPrsByExId } from "@/lib/queries/personalRecords";
+import { useToast } from "@/app/context/toastContext";
 
 const ExerciseList = ({ exercises }: { exercises: Exercise[] }) => {
+
   const [filter, setFilter] = useState<FilterExercise>({
     name: "",
     muscle: "All",
     equipment: "All",
     sorted: "popular",
   });
-
   const [showModal, setShowModal] = useState<boolean>(false);
   const [filteredEx, setFilteredEx] = useState<Exercise[]>(exercises);
   const [newExercise, setNewExercise] = useState<CreateExerciseInput>({
@@ -29,6 +31,25 @@ const ExerciseList = ({ exercises }: { exercises: Exercise[] }) => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+  const [prs,setPrs] = useState<PersonalRecord[]>([])
+
+  useEffect(() => {
+    setFilteredEx(exercises);
+  },[exercises])
+
+
+  const getPrsForExercise = async () => {
+    try {
+      if(!selectedExercise) return
+      const result = await getPrsByExId(selectedExercise?.id)
+      if(result.error ) return
+      if(result.success) setPrs(result.prs)
+      
+    } catch (error) {
+       console.log(error);
+       
+    }
+  }
 
   useEffect(() => {
     setFilteredEx(
@@ -61,9 +82,13 @@ const ExerciseList = ({ exercises }: { exercises: Exercise[] }) => {
     //console.log(filter)
   }, [filter]);
 
+  useEffect(() => {getPrsForExercise()}, [selectedExercise])
+
   const update = (fields: Partial<Exercise>) => {
     setNewExercise((prev) => ({ ...prev, ...fields }));
   };
+
+  const {showError} = useToast()
 
   const handleNewExercise = async () => {
     setError(null);
@@ -73,6 +98,7 @@ const ExerciseList = ({ exercises }: { exercises: Exercise[] }) => {
       const result = await uploadExercise(newExercise);
       if (result.error) {
         setError(result.error);
+        showError(result.error)
         setIsLoading(false);
       } else {
         setShowModal(false);
@@ -92,8 +118,7 @@ const ExerciseList = ({ exercises }: { exercises: Exercise[] }) => {
 
   return (
     <>
-      {showModal && (
-        <div className="fixed inset-0 bg-background/70 backdrop-blur-xs flex items-center justify-center z-50">
+      {showModal && 
           <CreateExerciseModal
             handleNewExercise={handleNewExercise}
             newExercise={newExercise}
@@ -102,8 +127,7 @@ const ExerciseList = ({ exercises }: { exercises: Exercise[] }) => {
             loading={isLoading}
             setShowModal={setShowModal}
           />
-        </div>
-      )}
+      }
 
       <div className="flex flex-1 flex-col gap-5 p-8">
         <div className="flex mb-7 flex-col gap-3">
@@ -167,11 +191,8 @@ const ExerciseList = ({ exercises }: { exercises: Exercise[] }) => {
             {filteredEx.map((exercise) => (
               <ExerciseCard key={exercise.id} exercise={exercise} onSelect={(ex) => setSelectedExercise(ex)} />
             ))}
-            {selectedExercise && (
-              <div className="fixed inset-0 bg-background/70 backdrop-blur-xs flex items-center justify-center z-50">
-                <ExerciseDetailModal exercise={selectedExercise} onClose={() => setSelectedExercise(null)} />
-              </div>
-            )}
+
+            {selectedExercise && <ExerciseDetailModal prs={prs} exercise={selectedExercise} onClose={() => setSelectedExercise(null)} />}
           </div>
         )}
       </div>

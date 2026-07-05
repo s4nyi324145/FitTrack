@@ -3,7 +3,7 @@
 
 import React, { useState } from "react";
 import type { WorkoutDetail } from "@/types";
-import ExerciseCard from "../detailedWorkout/ExerciseCard";
+import ExerciseCard from "../workoutDetails/ExerciseCard";
 
 
 

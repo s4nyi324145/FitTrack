@@ -1,14 +1,14 @@
 
-
-import React from "react";
 import WorkoutStats from "./WorkoutStats";
 import RecentWorkouts from "./RecentWorkouts";
 import type { RecentWorkout } from "@/types";
 import NewWorkoutButton from "./NewWorkoutButton";
-
+import ActiveWorkouts from "./ActiveWorkouts";
+import Link from "next/link";
 const WorkoutList = ({workouts}: {workouts: RecentWorkout[]}) => {
-  
 
+  const activeWorkouts: RecentWorkout[] | null = workouts.filter(w => w.finished_at === null)
+    
   return (
     <div className="flex flex-1 flex-col gap-5 p-8">
       <div className="flex mb-7 gap-4  w-full items-end flex-wrap justify-between">
@@ -19,14 +19,15 @@ const WorkoutList = ({workouts}: {workouts: RecentWorkout[]}) => {
           </p>
         </div>
         <div className="flex gap-3">
-                <button className="bg-background text-sm px-2 py-2 border border-border rounded-md">
+                <Link href={'workouts/templates'} className="bg-background text-sm px-2 py-2 border border-border rounded-md">
                     Templates
-                </button>
-                <NewWorkoutButton/>
+                </Link>
+                <NewWorkoutButton hasActiveWorkout={activeWorkouts.length != 0}/>
         </div>
       </div>
       <WorkoutStats/>
-      <RecentWorkouts workouts={workouts}/>
+      {activeWorkouts.length > 0  && <ActiveWorkouts workouts={activeWorkouts}/> }
+      <RecentWorkouts workouts={workouts.filter(w => w.finished_at !== null)}/>
     </div>
   );
 };

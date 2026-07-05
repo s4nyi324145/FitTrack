@@ -1,19 +1,8 @@
 import { Exercise } from "@/types";
-import {
-  Dumbbell,
-  BarChart2,
-  Cpu,
-  User,
-  Cable,
-  CircleDot,
-  CirclePlus,
-} from "lucide-react";
+import {Dumbbell,BarChart2,Cpu,User,Cable,CircleDot,CirclePlus} from "lucide-react";
 import React from "react";
 
-const muscleGroupColors: Record<
-  string,
-  { bg: string; text: string; border: string }
-> = {
+const muscleGroupColors: Record<string,{ bg: string; text: string; border: string }> = {
   chest: { bg: "bg-blue-500", text: "text-white", border: "border-blue-600" },
   back: {
     bg: "bg-purple-500",
@@ -46,10 +35,7 @@ const muscleGroupColors: Record<
   },
 };
 
-const equipmentConfig: Record<
-  string,
-  { label: string; icon: React.ReactNode }
-> = {
+const equipmentConfig: Record<string,{ label: string; icon: React.ReactNode }> = {
   barbell: { label: "Barbell", icon: <Dumbbell size={13} /> },
   dumbbell: { label: "Dumbbell", icon: <Dumbbell size={13} /> },
   machine: { label: "Machine", icon: <Cpu size={13} /> },
@@ -73,13 +59,15 @@ const muscleGroupLabel: Record<string, string> = {
   full_body: "Full Body",
 };
 
-// ExerciseCard.tsx
-const ExerciseCard = ({ exercise, onSelect }: { exercise: Exercise; onSelect?: (ex: Exercise) => void }) => {
-  const muscle =
-    muscleGroupColors[exercise.muscle_group.toLowerCase()] ??
-    muscleGroupColors.full_body;
-  const equip =
-    equipmentConfig[exercise.equipment.toLowerCase()] ?? equipmentConfig.other;
+type Props = {
+  exercise: Exercise,
+  onSelect?: (ex:Exercise) => void
+}
+
+const ExerciseCard = ({ exercise, onSelect }: Props) => {
+  
+  const muscle = muscleGroupColors[exercise.muscle_group.toLowerCase()] ??  muscleGroupColors.full_body;
+  const equip = equipmentConfig[exercise.equipment.toLowerCase()] ?? equipmentConfig.other;
 
   return (
     <div onClick={() => onSelect?.(exercise)} className="group bg-surface border border-border rounded-xl flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer overflow-hidden">
@@ -87,11 +75,7 @@ const ExerciseCard = ({ exercise, onSelect }: { exercise: Exercise; onSelect?: (
         className={`relative h-32 flex items-center justify-center ${muscle.bg} shrink-0`}
       >
         <Dumbbell size={40} className={`${muscle.text} opacity-20`} />
-        <span
-          className={`absolute top-2 left-2 text-xs font-semibold px-2 py-0.5 rounded-full border ${muscle.bg} ${muscle.text} ${muscle.border}`}
-        >
-          {muscleGroupLabel[exercise.muscle_group] ?? exercise.muscle_group}
-        </span>
+        
         {exercise.is_custom && (
           <span className="absolute top-2 right-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-primary-hover/50 text-primary border border-primary/30">
             Custom
@@ -101,29 +85,27 @@ const ExerciseCard = ({ exercise, onSelect }: { exercise: Exercise; onSelect?: (
 
       <div className="flex flex-col gap-3 p-4 flex-1">
         <div className="flex flex-col gap-0.5 min-w-0">
-          <p className="font-semibold text-sm text-foreground leading-snug line-clamp-2">
+          <p className="font-semibold text-sm min-w-0 truncate text-foreground leading-snug line-clamp-2">
             {exercise.name}
           </p>
         </div>
 
         <hr className="border-border" />
 
-        <div className="flex items-center justify-between gap-2 min-w-0">
+        <div className="flex items-end flex-1 justify-between gap-2 min-w-0">
           <div className="flex items-center gap-1.5 text-xs font-medium px-2 py-1 rounded-md border border-border bg-surface-raised text-text-muted min-w-0 max-w-[70%]">
             <span className="shrink-0">{equip.icon}</span>
             <span className="truncate">{equip.label}</span>
           </div>
+          <div>
+            <span
+          className={`flex text-xs font-semibold px-2 py-0.5 rounded-full border ${muscle.bg} ${muscle.text} ${muscle.border}`}
+        >
+          {muscleGroupLabel[exercise.muscle_group] ?? exercise.muscle_group}
+        </span>
+          </div>
 
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              // TODO: Add to workout
-            }}
-            className="shrink-0 text-primary hover:text-primary-hover transition-colors"
-            title="Add to workout"
-          >
-            <CirclePlus size={20} />
-          </button>
+          
         </div>
       </div>
     </div>

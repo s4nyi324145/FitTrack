@@ -20,7 +20,7 @@ const Navbar = () => {
   
 
   return (
-    <div className="flex flex-col w-[200] max-h-screen  shrink-0 min-h-screen bg-sidebar p-4 justify-between">
+    <div className="flex flex-col sticky top-0 left-0 flex-1 max-w-[200] max-h-screen  shrink-0 bg-sidebar p-4 justify-between">
       
       {/* Logo */}
       <div className="flex flex-col gap-8">
