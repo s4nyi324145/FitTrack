@@ -5,6 +5,7 @@ import Link from 'next/link'
 import InputField from '@/components/shared/InputField'
 import AddExerciseField from '@/components/workoutDetails/AddExerciseField'
 import { Exercise, TemplateWorkout } from '@/types'
+import TemplateExercisesCard from '../templetePage/TemplateExercisesCard'
 
 type Prop = {
     exercises: Exercise[],
@@ -15,6 +16,8 @@ const TemplateData = ({exercises, templateData}: Prop) => {
 
  
   const [templateDataS, setTemplateDataS] = useState<TemplateWorkout>(templateData)
+
+
   
   useEffect(() => {console.log(templateDataS);
   }, [templateDataS])
@@ -23,7 +26,7 @@ const TemplateData = ({exercises, templateData}: Prop) => {
 
   return (
     <div className='flex flex-1 flex-col  gap-5'>
-         <div className="flex items-center bg-surface border-b-2 border-border justify-between gap-5 p-5 ">
+         <div className="flex items-center bg-surface border-b-2 border-border justify-around  gap-5 p-5 ">
             <div className="flex items-center gap-3">
                 <Link href="/workouts/templates" className="flex hover:text-primary-hover text-primary text-md items-center gap-2 w-fit">
                     <ArrowLeft size={20}  />
@@ -35,7 +38,7 @@ const TemplateData = ({exercises, templateData}: Prop) => {
            
           </div>
 
-          <div className="flex flex-col gap-5 p-5">
+          <div className="flex   flex-col gap-5 p-5">
             <div className="flex bg-surface border border-border rounded-md p-4  gap-4">
                  <div className='flex flex-1'>
                       <InputField label='Template Name' placeholder='e.g Push Day (A)' type='text' value={templateDataS.template_name ?? ""} onChange={() => {}}  />
@@ -50,8 +53,18 @@ const TemplateData = ({exercises, templateData}: Prop) => {
               <p className='font-bold text-xl'>({templateData.exercises.length})</p>
             </div>
 
+            <div className='flex flex-col flex-1 gap-4'>
+                {templateData.exercises.map((e) => 
+                  <TemplateExercisesCard exercise={e}/>
+                
+                )}
+            </div>
+
             
+
+            <AddExerciseField workoutId={templateData.template_id} exercises={exercises} addedExercises={templateData.exercises}/>
           </div>
+          
           
     </div>
   )

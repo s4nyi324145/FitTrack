@@ -3,6 +3,7 @@
 
 import { createNewWorkout } from "@/app/actions/workoutsActions"
 import { useToast } from "@/app/context/toastContext"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 type Prop = {
@@ -13,33 +14,43 @@ export default function NewWorkoutButton({hasActiveWorkout}: Prop) {
 
   const [loading, setLoading] = useState(false)
   const {showError, showSuccess} = useToast()
+  const router = useRouter()
 
-  const handleNewWorkout = async () => {
+const handleNewWorkout = async () => {
+  
+  if (hasActiveWorkout) {
+    showError("You already have an active workout. Please finish it before starting a new one.");
+    return;
+  }
 
-    setLoading(true)
+  setLoading(true);
 
-    if(hasActiveWorkout){
-      showError("You already have an active workout. Please finish it before starting a new one.")
-      setLoading(false)
-      return
+  try {
+    const result = await createNewWorkout();
+
+
+    if (result?.error) {
+      showError(result.error);
+      return; 
     }
 
-    try {
-      const result = await createNewWorkout(hasActiveWorkout)
-      if(result.error){
-          return showError(result.error)
-      }
-      showSuccess("Workout created successfully")
-    }
-    catch (error) {
-      showError("Server error")
-    } 
-    finally {
-      setLoading(false)
-    }
-   
 
+    if (result?.workoutId) {
+      showSuccess("Workout created successfully");
+      router.refresh();
+      router.push(`/workouts/${result.workoutId}/active`);
+    } else {
+      showError("Failed to retrieve new workout ID.");
     }
+
+  } catch (error) {
+    console.error("New workout error:", error);
+    showError("Server error");
+  } finally {
+
+    setLoading(false);
+  }
+};
 
 
   return (

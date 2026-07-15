@@ -110,7 +110,7 @@ const ExerciseCard = ({ ex }: { ex: ExerciseCard }) => {
           {/* Footer */}
           <div className="flex justify-between px-4 py-2 bg-surface text-xs text-text-muted">
             <p>
-              Best set: <span className="font-bold text-foreground">{parseInt(bestSet?.weight)}kg × {bestSet?.reps}</span>
+              Best set: <span className="font-bold text-foreground">{parseInt(bestSet?.weight ?? 0)}kg × {bestSet?.reps ?? "-"}</span>
             </p>
             <p>
               Volume: <span className="font-bold text-foreground">{totalVolume} kg</span>

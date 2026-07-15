@@ -55,13 +55,15 @@ const ActiveWorkoutPage = async ({params}: {params: Promise<{ id: string }>;}) =
           )}
         </div>
 
+        
         <div className="flex items-end">
           <AddExerciseField
-            workoutDetail={workoutDetail}
+            addedExercises={workoutDetail.exercises}
             exercises={exercises}
             workoutId={workoutDetail.id}
           />
         </div>
+        
       </div>
     </div>
   );

@@ -298,7 +298,7 @@ const ActiveExerciseCard = ({ex,workout_id}: Props) => {
                 e.stopPropagation();
                 setShowAddNote(true);
               }}
-              className="text-text-muted text-xs hover:text-primary text-left w-fit"
+              className="text-text-muted text-xs cursor-pointer hover:text-primary text-left w-fit"
             >
               + Add note
             </button>

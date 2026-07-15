@@ -73,7 +73,7 @@ const ActiveWorkoutHeader = ({ workoutDetail }: { workoutDetail: WorkoutDetail }
       if (result?.success) {
         showSuccess("Workout finished successfully")
         router.push("/workouts")
-        router.refresh()
+        
       }
       
       

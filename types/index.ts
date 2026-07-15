@@ -123,3 +123,27 @@ export type TemplateWorkout = {
 }
 
 
+export type AddedExericses = {
+    id: number; // workout_exercises.id
+    exercise_id: number; // exercises.id
+    name: string;
+    order: number;
+    is_custom: number
+    notes: string
+    muscle_group: string
+    
+  
+
+}
+
+export type AddedExericsesTemplate = {
+  template_exercise_id: number;
+    sort_order: number;
+    default_sets: number;
+    default_reps: number;
+    default_weight_kg: number;
+    exercise_id: number;
+    exercise_name: string;
+    muscle_group: string;
+}
+

@@ -8,6 +8,8 @@ const page = async () => {
 
   const workoutTemplates = await getWorkoutTemplates()
 
+  
+
 
   return (
     <div className='flex flex-1 flex-col gap-5 p-8'>

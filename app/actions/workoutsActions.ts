@@ -63,15 +63,13 @@ export const editWorkoutById = async (workout_id: number,name: string,notes: str
   }
 };
 
-export const createNewWorkout = async (hasActiveWorkout: boolean) => {
+export const createNewWorkout = async () => {
   const session = await auth();
   const userId = session?.user?.id;
 
   if (!userId) return { error: "Unauthorized" };
 
-  if (hasActiveWorkout) {
-    return { error: "You already have an active workout. Please finish it before starting a new one." };
-  }
+  
 
   try {
     const result = await pool.query(
@@ -84,11 +82,11 @@ export const createNewWorkout = async (hasActiveWorkout: boolean) => {
     }
 
     const id = result.rows[0].id;
-    redirect(`/workouts/${id}/active`);
+    return {workoutId: id}
+
     
   } catch (error) {
     console.error("Delete workout error:", error);
-    if (isRedirectError(error)) throw error;
     return { error: "Server error" };
   }
 };

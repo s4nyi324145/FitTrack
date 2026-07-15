@@ -1,9 +1,9 @@
 import React, { Dispatch, SetStateAction, useEffect } from "react";
 import { X, Search } from "lucide-react";
-import type { Exercise, FilterExercise, WorkoutDetail } from "@/types";
+import type { AddedExericses, AddedExericsesTemplate, Exercise, FilterExercise, WorkoutDetail } from "@/types";
 import { useState } from "react";
 import InlineExerciseCard from "./InlineExerciseCard";
-const AddExerciseModal = ({exercises, workoutId, setShowExercises, workoutDetail}: {exercises: Exercise[], workoutId: number, setShowExercises: React.Dispatch<SetStateAction<boolean>>, workoutDetail: WorkoutDetail}) => {
+const AddExerciseModal = ({exercises, workoutId, setShowExercises, addedExercises}: {exercises: Exercise[], workoutId: number, setShowExercises: React.Dispatch<SetStateAction<boolean>>, addedExercises: AddedExericses[] | AddedExericsesTemplate[]}) => {
 
     const [filter, setFilter] = useState<FilterExercise>({
         name: "",
@@ -65,7 +65,7 @@ const AddExerciseModal = ({exercises, workoutId, setShowExercises, workoutDetail
         
         <div className="flex flex-col max-h-[500px] overflow-y-auto gap-2">
             {filteredEx.map((ex,index) => 
-                <InlineExerciseCard key={index} workoutDetail={workoutDetail} workout_id={workoutId} ex={ex}/>
+                <InlineExerciseCard key={index} addedExercises={addedExercises} workout_id={workoutId} ex={ex}/>
         )}
         </div>
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Exercise, WorkoutDetail } from "@/types";
+import { AddedExericses, AddedExericsesTemplate, Exercise, WorkoutDetail } from "@/types";
 import React from "react";
 import {
   Dumbbell,
@@ -79,21 +79,21 @@ const equipmentConfig: Record<
 const InlineExerciseCard = ({
   ex,
   workout_id,
-  workoutDetail,
+  addedExercises,
 }: {
   ex: Exercise;
   workout_id: number;
-  workoutDetail: WorkoutDetail;
+  addedExercises: AddedExericses[] | AddedExericsesTemplate[];
 }) => {
 
 
-  const isAdded = workoutDetail.exercises.some(
+  const isAdded = addedExercises.some(
     exercise => exercise.exercise_id === ex.id,
   );
 
   const handleAddingExercise = async () => {
     if(isAdded) return false
-    const order = workoutDetail.exercises.length 
+    const order = addedExercises.length 
     await addExerciseToWorkout(workout_id, ex.id, order);
   };
 
