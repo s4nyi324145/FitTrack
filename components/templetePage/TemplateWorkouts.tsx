@@ -9,6 +9,7 @@ import TempleteWorkoutCard from './TempleteWorkoutCard';
 import { useState } from 'react';
 import { useToast } from '@/app/context/toastContext';
 import { createNewTemplate } from '@/app/actions/templateActions';
+import { useRouter } from 'next/navigation';
 
 type Prop = {
   workoutTemplates: TemplateWorkout[]
@@ -53,6 +54,7 @@ const TemplateWorkouts = ({workoutTemplates}: Prop) => {
 
     const [loading, setLoading] = useState(false)
     const {showError, showSuccess} = useToast()
+    const router = useRouter()
   
     const handleNewTemplate = async () => {
   
@@ -60,10 +62,11 @@ const TemplateWorkouts = ({workoutTemplates}: Prop) => {
   
       try {
         const result = await createNewTemplate()
-        if(result.error){
+        if(result?.error){
             return showError(result.error)
         }
-        showSuccess("Workout created successfully")
+        showSuccess("Template created successfully")
+        router.push(`/workouts/templates/${result.id}`)
       }
       catch (error) {
         showError("Server error")

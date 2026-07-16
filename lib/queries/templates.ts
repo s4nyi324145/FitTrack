@@ -36,16 +36,13 @@ export const getWorkoutTemplates = async () => {
        
         const rows = result.rows
 
-         const templateWorkouts: TemplateWorkout[] = [{
-            template_id: rows[0].template_id,
-            template_name: rows[0].template_name,
-            template_notes: rows[0].template_notes,
-            exercises: []
-        }]
-        //console.log(rows)
+    
+
+         const templateWorkouts: TemplateWorkout[] = []
+        console.log(rows)
 
         for (const row of rows) {
-
+            if(!row.template_id) return []
             let templete = templateWorkouts.find(t => t.template_id === row.template_id)
 
             if(!templete) {
@@ -57,9 +54,9 @@ export const getWorkoutTemplates = async () => {
                 }
                 templateWorkouts.push(templete)
             }
-            
-            let ex = templete.exercises.find(e => e.template_exercise_id === row.template_exercise_id)
 
+            if(row.template_exercise_id === null) continue
+            let ex = templete.exercises.find(e => e.template_exercise_id === row.template_exercise_id)
             if(!ex) {
                  ex = {
                     template_exercise_id: row.template_exercise_id,
@@ -77,7 +74,8 @@ export const getWorkoutTemplates = async () => {
        
         
 
-          
+            //console.log(ex);
+            
             
         }
         console.log(templateWorkouts)

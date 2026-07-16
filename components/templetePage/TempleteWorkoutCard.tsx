@@ -28,7 +28,13 @@ const TempleteWorkoutCard = ({ template, muscleGroupColors }: Prop) => {
         try {
 
             const result = await deleteTemplateById(selectedTemplate.template_id ?? 0)
-            setShowConfirm(false)
+            if(result?.error) setError(result.error)
+            else {
+                setShowConfirm(false)
+            }
+
+            //TODO: check with ai this actionss
+            
             
         } catch (error) {
             setError("Server error")

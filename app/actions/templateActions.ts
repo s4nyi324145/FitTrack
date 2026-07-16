@@ -2,6 +2,7 @@
 
 import { auth } from "@/lib/auth"
 import pool from "@/lib/pg"
+import { error } from "console"
 import { revalidatePath } from "next/cache"
 import { isRedirectError } from "next/dist/client/components/redirect-error"
 import { redirect } from "next/navigation"
@@ -21,14 +22,11 @@ export const createNewTemplate = async() => {
         if(result.rowCount === 0) return ({error: "Can not create new template"})
         
         const id = result.rows[0].id;
-        redirect(`/workouts/templates/${id}`);
+        return ({id: id})
         
 
         
     } catch (error) {
-        console.log(error);
-        
-        if(isRedirectError(error)) throw error
         return({error: "Server error"})
     }
 }
@@ -39,11 +37,13 @@ export const deleteTemplateById = async(template_id:number) => {
 
     if(!userId) return({error: "Unauthorized"})
 
+        if(!template_id || isNaN(template_id) || template_id < 0) return({error: "Invalid template id"})
+
     try {
 
         const result = await pool.query(`DELETE FROM workout_templates   WHERE id = $1 AND user_id = $2`, [template_id, userId])
 
-        if(result.rowCount === 0) return ({error: "Can not delete this template"})
+        if(result.rowCount === 0) return ({error: "Invalid template id or Unauthorized"})
         
         //TODO: template_id check and other security options
         revalidatePath("/workouts/templates")

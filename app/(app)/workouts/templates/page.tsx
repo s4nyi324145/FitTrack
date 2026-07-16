@@ -7,6 +7,8 @@ const page = async () => {
 
 
   const workoutTemplates = await getWorkoutTemplates()
+  console.log(workoutTemplates);
+  
 
   
 

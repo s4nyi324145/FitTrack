@@ -32,7 +32,7 @@ const TemplateData = ({exercises, templateData}: Prop) => {
                     <ArrowLeft size={20}  />
                     <p className=" text-md">Templates</p>
                   </Link>
-                   <p className=" text-xl  font-bold">New Template</p>
+                   <p className=" text-xl  font-bold">{templateDataS.template_name}</p>
             </div>
             <button className="bg-primary cursor-pointer hover:bg-primary-hover transition-colors hover:text-white flex justify-end font-bold text-sm text-green-800 border border-green-800 rounded-full px-4 py-2">Save Template</button>
            
