@@ -56,3 +56,22 @@ export const deleteTemplateById = async(template_id:number) => {
         return({error: "Server error"})
     }
 }
+
+export const editTemplateById = async(template_id:number, template_name: string, template_notes: string) => {
+
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if(!userId) return({error: "Unauthorized"})
+    if(template_name.trim() === "") return({error: "Template name can not be empty"})
+    if(isNaN(template_id) || template_id < 0 || !template_id) return({error: "Invalid template id"})
+
+    try {
+        const result = await pool.query("UPDATE workout_templates SET name = $1, notes = $2 WHERE id = $3", [template_name,template_notes,template_id])
+
+        if(result.rowCount === 0) return({error: "Can not update this template"})
+        return({succes: true})
+    } catch (error) {
+        return ({error: "Server error"})   
+    }
+}

@@ -1,8 +1,11 @@
 import { AddedExericsesTemplate } from '@/types'
+import { useSortable } from '@dnd-kit/react/sortable';
+import { GripVertical } from 'lucide-react';
 import React from 'react'
 
 type Props = {
     exercise: AddedExericsesTemplate
+    index: number
 }
 
 const muscleGroupColors: Record<string,{ bg: string; text: string; border: string } > = {
@@ -39,17 +42,21 @@ const muscleGroupColors: Record<string,{ bg: string; text: string; border: strin
 };
 
 
-const TemplateExercisesCard = ({exercise}: Props) => {
+const TemplateExercisesCard = ({exercise,index}: Props) => {
       const muscle = muscleGroupColors[exercise.muscle_group] ?? { bg: "bg-surface-raised", text: "text-text-muted", border: "border-border" }
+
+     const {ref, handleRef, isDragSource} = useSortable({id: String(exercise.template_exercise_id), index: index})
+
   return (
-     <div className="flex flex-col rounded-xl border border-border overflow-hidden">
+     <div ref={ref} className="flex flex-col rounded-xl border border-border overflow-hidden">
     
       <div
         className="bg-surface-raised flex flex-col p-4 flex-1 justify-center cursor-pointer hover:bg-border/30 transition-colors"
         
       >
-        <div className="flex justify-between items-center">
+        <div  className="flex justify-between  items-center">
           <div className="flex gap-3 items-center">
+            <GripVertical ref={handleRef} className=" cursor-pointer hover:text-primary-hover transition-colors" size={18}/>
           <p className="font-bold text-foreground">{exercise.exercise_name}</p>
           <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${muscle.bg} ${muscle.text} ${muscle.border}`}>
             {exercise.muscle_group.charAt(0).toUpperCase() + exercise.muscle_group.slice(1)}

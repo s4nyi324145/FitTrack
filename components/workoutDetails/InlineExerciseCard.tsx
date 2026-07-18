@@ -80,10 +80,12 @@ const InlineExerciseCard = ({
   ex,
   workout_id,
   addedExercises,
+  type
 }: {
   ex: Exercise;
   workout_id: number;
   addedExercises: AddedExericses[] | AddedExericsesTemplate[];
+  type: string
 }) => {
 
 
@@ -94,7 +96,7 @@ const InlineExerciseCard = ({
   const handleAddingExercise = async () => {
     if(isAdded) return false
     const order = addedExercises.length 
-    await addExerciseToWorkout(workout_id, ex.id, order);
+    await addExerciseToWorkout(workout_id, ex.id, order, type);
   };
 
   

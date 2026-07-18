@@ -60,6 +60,7 @@ const ActiveWorkoutPage = async ({params}: {params: Promise<{ id: string }>;}) =
           <AddExerciseField
             addedExercises={workoutDetail.exercises}
             exercises={exercises}
+            type={"workout"}
             workoutId={workoutDetail.id}
           />
         </div>

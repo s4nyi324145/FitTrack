@@ -13,10 +13,12 @@ const AddExerciseField = ({
   workoutId,
   exercises,
   addedExercises,
+  type
 }: {
   workoutId: number;
   exercises: Exercise[];
   addedExercises: AddedExericses[] | AddedExericsesTemplate[];
+  type: string
 }) => {
   const [showExercises, setShowExercises] = useState<boolean>(false);
 
@@ -28,6 +30,7 @@ const AddExerciseField = ({
           setShowExercises={setShowExercises}
           workoutId={workoutId}
           exercises={exercises}
+          type={type}
         />
       )}
 

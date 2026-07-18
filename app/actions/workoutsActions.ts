@@ -95,6 +95,7 @@ export const addExerciseToWorkout = async (
   workout_id: number,
   id: number,
   order: number,
+  type:string
 ) => {
   const session = await auth();
   const userId = session?.user?.id;
@@ -108,10 +109,23 @@ export const addExerciseToWorkout = async (
   }
 
   try {
-    await pool.query(
+    
+
+    if(type == "template") {
+       await pool.query(
+      "INSERT INTO workout_template_exercises (template_id, exercise_id, sort_order) VALUES ($1,$2, $3) ",
+      [workout_id, id, order],
+    );
+    }
+
+    else {
+      await pool.query(
       "INSERT INTO workout_exercises (workout_id, exercise_id, sort_order) VALUES ($1,$2, $3) ",
       [workout_id, id, order],
     );
+    }
+
+    
     revalidatePath(`/workouts/${workout_id}/active`);
   } catch (error) {
     console.error("Adding exercise to workout error:", error);

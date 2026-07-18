@@ -3,7 +3,7 @@ import { X, Search } from "lucide-react";
 import type { AddedExericses, AddedExericsesTemplate, Exercise, FilterExercise, WorkoutDetail } from "@/types";
 import { useState } from "react";
 import InlineExerciseCard from "./InlineExerciseCard";
-const AddExerciseModal = ({exercises, workoutId, setShowExercises, addedExercises}: {exercises: Exercise[], workoutId: number, setShowExercises: React.Dispatch<SetStateAction<boolean>>, addedExercises: AddedExericses[] | AddedExericsesTemplate[]}) => {
+const AddExerciseModal = ({exercises, workoutId, setShowExercises, addedExercises, type}: {exercises: Exercise[], workoutId: number, setShowExercises: React.Dispatch<SetStateAction<boolean>>, addedExercises: AddedExericses[] | AddedExericsesTemplate[], type:string}) => {
 
     const [filter, setFilter] = useState<FilterExercise>({
         name: "",
@@ -65,7 +65,7 @@ const AddExerciseModal = ({exercises, workoutId, setShowExercises, addedExercise
         
         <div className="flex flex-col max-h-[500px] overflow-y-auto gap-2">
             {filteredEx.map((ex,index) => 
-                <InlineExerciseCard key={index} addedExercises={addedExercises} workout_id={workoutId} ex={ex}/>
+                <InlineExerciseCard key={index} addedExercises={addedExercises} type={type} workout_id={workoutId} ex={ex}/>
         )}
         </div>
         </div>
