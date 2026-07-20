@@ -116,17 +116,22 @@ export const addExerciseToWorkout = async (
       "INSERT INTO workout_template_exercises (template_id, exercise_id, sort_order) VALUES ($1,$2, $3) ",
       [workout_id, id, order],
     );
+
+    
     }
 
     else {
       await pool.query(
       "INSERT INTO workout_exercises (workout_id, exercise_id, sort_order) VALUES ($1,$2, $3) ",
-      [workout_id, id, order],
+      [workout_id, id, order]
+
     );
+
+     revalidatePath(`/workouts/${workout_id}/active`);
     }
 
-    
-    revalidatePath(`/workouts/${workout_id}/active`);
+     revalidatePath(`/workouts/templates/${workout_id}`);
+   
   } catch (error) {
     console.error("Adding exercise to workout error:", error);
     return { error: "Server error" };

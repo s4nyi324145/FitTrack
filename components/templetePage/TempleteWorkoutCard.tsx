@@ -55,7 +55,7 @@ const TempleteWorkoutCard = ({ template, muscleGroupColors }: Prop) => {
     <>
          
     
-    <div key={template.template_id} className="border relative bg-surface border-border rounded-md p-4 flex flex-col gap-1 transition-all">
+    <div key={template.template_id} className="border relative bg-surface border-border rounded-md p-4 flex min-h-1.5 flex-col gap-1 transition-all">
         
         {showConfirm && (
         <div className="fixed inset-0 bg-background/70 backdrop-blur-xs flex items-center justify-center z-50">

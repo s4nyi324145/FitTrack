@@ -39,7 +39,7 @@ const TemplateData = ({exercises, templateData}: Prop) => {
 
     try {
       
-       const result = await editTemplateById(templateData.template_id, templateDataS.template_name, templateDataS.template_notes)
+       const result = await editTemplateById(templateDataS)
 
        if(result?.error) showError(result.error)
         if(result.succes) showSuccess("Template updated succesfully")
@@ -51,6 +51,8 @@ const TemplateData = ({exercises, templateData}: Prop) => {
     }
 
   }
+
+  useEffect(() => setTemplateDataS(templateData), [templateData])
   
 
 
@@ -104,11 +106,11 @@ const TemplateData = ({exercises, templateData}: Prop) => {
                   if (!isChanged) setIsChanged(true);
 
                   }
-                  //TODO: updated the orders in database
+                  
 
                 }}>
                     {templateDataS.exercises.map((e,index) => 
-                    <TemplateExercisesCard index={index} key={e.template_exercise_id} exercise={e}/>
+                    <TemplateExercisesCard index={index} key={e.template_exercise_id} templateDataS={templateDataS} setTemplateDataS={setTemplateDataS} templete_id={templateData.template_id} exercise={e}/>
                   
                   )}
                 </DragDropProvider>

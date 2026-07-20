@@ -80,7 +80,7 @@ const TemplateWorkouts = ({workoutTemplates}: Prop) => {
 
 
   return (
-    <div className="grid" style={{gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '1rem', height: '100%'}}>
+    <div className="grid" style={{gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '1rem'}}>
        {workoutTemplates.map((template) => (
         <TempleteWorkoutCard key={template.template_id} template={template} muscleGroupColors={muscleGroupColors} />
        ))}
